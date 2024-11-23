@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart with Discounts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            width: 400px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form {
+            margin-bottom: 20px;
+        }
+
+        .form input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .cart-items {
+            margin-top: 20px;
+        }
+
+        .cart-items .item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .cart-items .item button {
+            background-color: #dc3545;
+            padding: 5px;
+            font-size: 0.8rem;
+        }
+
+        .cart-items .item button:hover {
+            background-color: #c82333;
+        }
+
+        .total {
+            font-weight: bold;
+            margin-top: 15px;
+            text-align: right;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Shopping Cart with Discounts</h1>
+
+        <div class="form">
+            <input type="text" id="item-name" placeholder="Item Name">
+            <input type="number" id="item-price" placeholder="Price" min="0" step="any">
+            <button onclick="addItem()">Add Item</button>
+        </div>
+
+        <div class="form">
+            <input type="number" id="discount" placeholder="Discount %" min="0" step="any">
+            <button onclick="applyDiscount()">Apply Discount</button>
+        </div>
+
+  
+        <div class="cart-items">
+            <h3>Cart Items</h3>
+            <div id="cart-list"></div>
+            <div class="total">
+                Total: $<span id="total-price">0.00</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cart = [];
+        const cartList = document.getElementById('cart-list');
+        const totalPriceElement = document.getElementById('total-price');
+
+
+        function addItem() {
+            const itemName = document.getElementById('item-name').value.trim();
+            const itemPrice = parseFloat(document.getElementById('item-price').value.trim());
+
+            if (itemName && itemPrice > 0) {
+                const existingItem = cart.find(item => item.name === itemName);
+
+                if (existingItem) {
+                    existingItem.quantity++;
+                } else {
+                    cart.push({ name: itemName, price: itemPrice, quantity: 1 });
+                }
+
+      
+                document.getElementById('item-name').value = '';
+                document.getElementById('item-price').value = '';
+                renderCart();
+            } else {
+                alert("Please enter a valid item name and price.");
+            }
+        }
+
+        function removeItem(itemIndex) {
+            cart.splice(itemIndex, 1);
+            renderCart();
+        }
+
+        function applyDiscount() {
+            const discountPercentage = parseFloat(document.getElementById('discount').value.trim());
+
+            if (!isNaN(discountPercentage) && discountPercentage >= 0) {
+                renderCart(discountPercentage);
+            } else {
+                alert("Please enter a valid discount percentage.");
+            }
+        }
+
+
+        function renderCart(discountPercentage = 0) {
+            cartList.innerHTML = '';
+            let total = 0;
+
+
+            cart.forEach((item, index) => {
+                const itemElement = document.createElement('div');
+                itemElement.classList.add('item');
+                itemElement.innerHTML = `${item.name} - $${item.price.toFixed(2)} x ${item.quantity}
+                                        <button onclick="removeItem(${index})">Remove</button>`;
+                cartList.appendChild(itemElement);
+
+                total += item.price * item.quantity;
+            });
+
+            if (discountPercentage > 0) {
+                total -= (total * discountPercentage) / 100;
+            }
+
+            totalPriceElement.textContent = total.toFixed(2);
+        }
+    </script>
+</body>
+
+</html>
